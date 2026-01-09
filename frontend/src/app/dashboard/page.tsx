@@ -168,8 +168,7 @@ export default function Dashboard() {
             {/* Quick Actions */}
             <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    Quick Actions
-                </h3>
+                    <Zap className="w-5 h-5 text-yellow-500" />\n                    Quick Actions\n                </h3>
                 <div className="flex gap-4 flex-wrap">
                     <button
                         onClick={fetchLeads}
@@ -601,3 +600,4 @@ export default function Dashboard() {
             </div>
         </div>
     );
+
