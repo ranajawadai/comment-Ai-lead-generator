@@ -6,11 +6,13 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Environment variables
+# Environment variables - EXCLUDE ALL .env files
 .env
 .env.local
 .env.production
 .env.development
+.env.example
+.env.*.local
 
 # Python
 *.egg-info/
@@ -50,6 +52,9 @@ logs/
 *.tmp
 *.temp
 
-# Production files (keep these out)
+# Production files
 backend/leads_database.csv
 frontend/.next/
+
+# Test files (optional - remove if you want to keep them)
+test*.json
