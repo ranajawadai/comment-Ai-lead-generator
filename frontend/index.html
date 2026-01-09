@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lead Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .premium-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .premium-card:hover {
+            border-color: #475569;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar {
+            background: #0f172a;
+            border-right: 1px solid #334155;
+        }
+        .sidebar-link {
+            color: #94a3b8;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .sidebar-link:hover {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+        .sidebar-link.active {
+            background: #1e293b;
+            color: #3b82f6;
+            border-left: 3px solid #3b82f6;
+        }
+        .badge-high {
+            background: #dc2626;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-normal {
+            background: #475569;
+            color: #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .source-facebook {
+            color: #1877f2;
+        }
+        .source-instagram {
+            color: #e4405f;
+        }
+        .custom-table {
+            background: #1e293b;
+            border: 1px solid #334155;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .custom-table th {
+            background: #0f172a;
+            color: #94a3b8;
+            font-weight: 600;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .custom-table td {
+            padding: 12px;
+            border-top: 1px solid #334155;
+        }
+        .custom-table tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .loading-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="border-b border-gray-700 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-bolt text-blue-500 text-xl"></i>
+                    <h1 class="text-2xl font-bold text-white">AI Lead Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4 text-sm text-gray-400">
+                    <span id="lastUpdate" class="flex items-center space-x-1">
+                        <i class="fas fa-clock"></i>
+                        <span>Waiting for data...</span>
+                    </span>
+                    <button onclick="fetchLeads()" class="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-md transition-colors">
+                        <i class="fas fa-sync-alt" id="refreshIcon"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex max-w-7xl mx-auto">
+        <!-- Sidebar -->
+        <aside class="w-64 min-h-screen sidebar sticky top-16">
+            <nav class="p-4 space-y-2">
+                <div class="sidebar-link active flex items-center space-x-3 px-4 py-3 rounded-lg">
+                    <i class="fas fa-home"></i>
+                    <span class="font-medium">Dashboard</span>
+                </div>
+                <div class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg">
+                    <i class="fas fa-users"></i>
+                    <span class="font-medium">Leads</span>
+                </div>
+                <div class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="font-medium">Analytics</span>
+                </div>
+                <div class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg">
+                    <i class="fas fa-cog"></i>
+                    <span class="font-medium">Settings</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="premium-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-sm font-medium">Total Leads</span>
+                        <i class="fas fa-users text-blue-500"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-white" id="totalLeads">0</div>
+                    <div class="text-xs text-gray-500 mt-1">All sources</div>
+                </div>
+
+                <div class="premium-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-sm font-medium">High Priority</span>
+                        <i class="fas fa-exclamation-circle text-red-500"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-white" id="highPriority">0</div>
+                    <div class="text-xs text-gray-500 mt-1">Requires attention</div>
+                </div>
+
+                <div class="premium-card rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-sm font-medium">AI Responses</span>
+                        <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-white" id="aiResponses">0</div>
+                    <div class="text-xs text-gray-500 mt-1">Sent successfully</div>
+                </div>
+            </div>
+
+            <!-- Leads Table -->
+            <div class="premium-card rounded-xl overflow-hidden">
+                <div class="p-4 border-b border-gray-700">
+                    <h2 class="text-lg font-semibold text-white">Recent Leads</h2>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>User</th>
+                                <th>Comment</th>
+                                <th>AI Response</th>
+                                <th>Priority</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsTableBody">
+                            <tr>
+                                <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full loading-dot"></div>
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full loading-dot" style="animation-delay: 0.2s"></div>
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full loading-dot" style="animation-delay: 0.4s"></div>
+                                        <span class="ml-2">Loading leads...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-6 text-center text-sm text-gray-500">
+                <p>AI Lead Dashboard v1.0 • Real-time monitoring active</p>
+                <p class="mt-1">Backend: <span id="backendStatus">Connecting...</span></p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let leadsData = [];
+
+        function getSourceIcon(source) {
+            if (source.toLowerCase() === 'facebook') {
+                return '<i class="fas fa-facebook source-facebook"></i>';
+            } else if (source.toLowerCase() === 'instagram') {
+                return '<i class="fab fa-instagram source-instagram"></i>';
+            }
+            return '<i class="fas fa-user text-gray-400"></i>';
+        }
+
+        function getPriorityBadge(priority) {
+            if (priority.toLowerCase() === 'high') {
+                return '<span class="badge-high">High</span>';
+            } else {
+                return '<span class="badge-normal">Normal</span>';
+            }
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+
+        async function fetchLeads() {
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.classList.add('fa-spin');
+
+            try {
+                const response = await axios.get('http://localhost:8000/leads');
+                const leads = response.data.leads || [];
+                
+                leadsData = leads;
+                
+                // Update stats
+                document.getElementById('totalLeads').textContent = leads.length;
+                document.getElementById('highPriority').textContent = leads.filter(l => l.priority === 'High').length;
+                document.getElementById('aiResponses').textContent = leads.filter(l => l.ai_response && l.ai_response.trim() !== '').length;
+                
+                // Update table
+                const tbody = document.getElementById('leadsTableBody');
+                if (leads.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                                No leads found. Send a webhook to start collecting data.
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tbody.innerHTML = leads.map(lead => `
+                        <tr>
+                            <td>
+                                <div class="flex items-center space-x-2">
+                                    ${getSourceIcon(lead.source)}
+                                    <span class="capitalize text-sm">${lead.source}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="text-sm font-mono text-gray-300">${lead.user_id}</span>
+                            </td>
+                            <td>
+                                <div class="truncate text-sm" title="${lead.comment_text}">
+                                    ${lead.comment_text}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="truncate text-sm text-gray-300" title="${lead.ai_response || '-'}">
+                                    ${lead.ai_response || '-'}
+                                </div>
+                            </td>
+                            <td>
+                                ${getPriorityBadge(lead.priority)}
+                            </td>
+                            <td>
+                                <span class="text-sm text-gray-400">${formatTime(lead.timestamp)}</span>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Update last update time
+                const now = new Date();
+                document.getElementById('lastUpdate').innerHTML = `
+                    <i class="fas fa-clock"></i>
+                    <span>Updated: ${formatTime(now.toISOString())}</span>
+                `;
+
+                // Update backend status
+                document.getElementById('backendStatus').innerHTML = '<span style="color: #10b981;">Connected ✓</span>';
+
+            } catch (error) {
+                console.error('Error fetching leads:', error);
+                document.getElementById('backendStatus').innerHTML = '<span style="color: #ef4444;">Disconnected ✗</span>';
+                
+                const tbody = document.getElementById('leadsTableBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-red-400">
+                            Error connecting to backend. Make sure Python server is running on port 8000.
+                        </td>
+                    </tr>
+                `;
+            } finally {
+                refreshIcon.classList.remove('fa-spin');
+            }
+        }
+
+        // Auto-refresh every 5 seconds
+        setInterval(fetchLeads, 5000);
+
+        // Initial load
+        setTimeout(fetchLeads, 1000);
+    </script>
+</body>
+</html>
