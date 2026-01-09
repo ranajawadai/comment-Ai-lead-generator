@@ -1,0 +1,11 @@
+{
+    "buildCommand": "next build",
+    "outputDirectory": ".next",
+    "devCommand": "next dev",
+    "installCommand": "npm install",
+    "framework": "nextjs",
+    "env": {
+        "NEXT_PUBLIC_BACKEND_URL": "https://161.118.195.178.nip.io",
+        "NEXT_PUBLIC_API_KEY": "my_secure_api_key_2025"
+    }
+}
