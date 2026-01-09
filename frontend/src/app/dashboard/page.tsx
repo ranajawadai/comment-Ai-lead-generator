@@ -18,7 +18,8 @@ import {
     Trophy,
     Star,
     Flame,
-    Sparkles,
+    
+    Sparkles
 } from 'lucide-react';
 
 interface Lead {
@@ -168,7 +169,9 @@ export default function Dashboard() {
             {/* Quick Actions */}
             <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-yellow-500" />\n                    Quick Actions\n                </h3>
+                    <Zap className="w-5 h-5 text-yellow-500" />
+                    Quick Actions
+                </h3>
                 <div className="flex gap-4 flex-wrap">
                     <button
                         onClick={fetchLeads}
@@ -524,8 +527,8 @@ export default function Dashboard() {
                                     key={item.id}
                                     onClick={() => setActiveTab(item.id)}
                                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all ${isActive
-                                        ? `bg-${item.color}-600 text-white shadow-lg`
-                                        : `text-gray-600 hover:bg-${item.color}-50 hover:text-${item.color}-600`
+                                            ? `bg-${item.color}-600 text-white shadow-lg`
+                                            : `text-gray-600 hover:bg-${item.color}-50 hover:text-${item.color}-600`
                                         }`}
                                 >
                                     <Icon className="w-5 h-5" />
@@ -552,8 +555,8 @@ export default function Dashboard() {
                                     key={item.id}
                                     onClick={() => setActiveTab(item.id)}
                                     className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${isActive
-                                        ? `bg-${item.color}-600 text-white`
-                                        : `bg-gray-100 text-gray-600`
+                                            ? `bg-${item.color}-600 text-white`
+                                            : `bg-gray-100 text-gray-600`
                                         }`}
                                 >
                                     <Icon className="w-4 h-4" />
@@ -600,4 +603,4 @@ export default function Dashboard() {
             </div>
         </div>
     );
-
+}
