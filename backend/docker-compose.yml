@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  ai-lead-backend:
+    build: .
+    container_name: ai-lead-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+    env_file:
+      - .env
+    volumes:
+      - ./leads_database.csv:/app/leads_database.csv
+    networks:
+      - ai-lead-network
+
+networks:
+  ai-lead-network:
+    driver: bridge
